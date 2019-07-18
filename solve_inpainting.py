@@ -6,7 +6,7 @@ from solvers.inpainter import solveInpainting
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='solve inpainting')
     parser.add_argument('-prior',type=str,help='choose with prior to use glow, dcgan', default='glow')
-    parser.add_argument('-experiment', type=str, help='the experiment to peform',default='celeba_inpaint_glow_init_std_0.0')
+    parser.add_argument('-experiment', type=str, help='the name of experiment',default='celeba_inpaint_glow_init_std_0.0')
     parser.add_argument('-dataset', type=str, help='the dataset/images to use',default='celeba')
     parser.add_argument('-model', type=str, help='which model to use',default='celeba')
     parser.add_argument('-inpaint_method',type=str,help='type of mask to apply',default='center')

@@ -5,7 +5,7 @@ from solvers.cs import solveCS
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='solve compressive sensing')
     parser.add_argument('-prior',type=str,help='choose with prior to use glow, dcgan, wavelet, dct', default='glow')
-    parser.add_argument('-experiment', type=str, help='the experiment to peform',default='celeba_cs_glow')
+    parser.add_argument('-experiment', type=str, help='the name of the experiment',default='celeba_cs_glow')
     parser.add_argument('-dataset', type=str, help='the dataset/images to use',default='celeba')
     parser.add_argument('-model', type=str, help='which model to use',default='celeba')
     parser.add_argument('-m',  type=int, nargs='+',help='no. of measurements',default=[12288,10000,7500,5000,2500,1000,750,500,400,300,200,100,50,30,20])

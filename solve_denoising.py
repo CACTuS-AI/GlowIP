@@ -6,7 +6,7 @@ from solvers.denoiser import solveDenoising
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='solve denoising')
     parser.add_argument('-prior',type=str,help='choose with prior to use glow, dcgan', default='glow')
-    parser.add_argument('-experiment', type=str, help='the experiment to peform',default='celeba_denoising_glow_noisestd_0.10')
+    parser.add_argument('-experiment', type=str, help='the name of experiment',default='celeba_denoising_glow_noisestd_0.10')
     parser.add_argument('-dataset', type=str, help='the dataset/images to use',default='celeba')
     parser.add_argument('-model', type=str, help='which model to use',default='celeba')
     parser.add_argument('-gamma',  type=float, nargs='+',help='regularizor',default=[0,0.01,0.025,0.05,0.075,0.1,0.25,0.5,0.75,1,2.5,5,7.5,10,20,30,40,50])
