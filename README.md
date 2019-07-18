@@ -128,7 +128,16 @@ The results of each experiment will be saved in the ```results``` directory.
 
 **Run all experiments from paper**
 
-To reproduce all experiments from paper, run all the shell scripts in the folder ```run/``` from the root directory of the project.
+To reproduce all experiments from paper, run all the shell scripts in the folder ```run/``` from the root directory of the project. For example,
+
+```shell
+# reproduce results of cs on out-of-distribution (ood) using glow prior
+./run/run_ood_cs_glow_main.sh
+# reproduce results of denoising on celeba using glow prior at noise level 0.1
+./run/run_celeba_denoising_glow_noisestd_0.10.sh
+```
+
+
 
 <br/>
 <br/>
