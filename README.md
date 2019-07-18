@@ -6,37 +6,17 @@ Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **
 In this paper, we demonstrate that an invertible generative model, specifically GLOW, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.
 
 
+| ![image](./images/cs_plot.png) | ![image](./images/denoising_plot.png) | 
+| :---: | :---: |
+| <b> Compressive Sensing </b> | <b> Denoising </b> |
 
-<table align="center">
-  <tr>
-     <td>
-        <img style="width: 400px" src="./images/cs_plot.png"/>
-         <center/><b>Compressive Sensing</b>
-     </td>
-     <td>
-        <img style="width: 450px" src="./images/denoising_plot.png"/>
-         <center/><b>Denoising</b>
-     </td>
-  </tr>
-</table>
+| ![image](./images/cs_visual_m750.jpg) |
+| :---: |
+| <b>Compressive Sensing at m=750 (6%) measurements</b> |
 
-<table align="center">
-  <tr>
-     <td>
-        <img style="width: 800px" src="./images/cs_visual_m750.jpg"/>
-         <center/><b>Compressive Sensing at m=750 (6%) measurements</b>
-     </td>
-  </tr>
-</table> 
-
-<table align="center">
-  <tr>
-     <td>
-        <img style="width: 800px" src="./images/denoising_visual.jpg"/>
-         <center/><b>Denoising</b>
-     </td>
-  </tr>
-</table> 
+| ![image](./images/denoising_visual.jpg) |
+| :---: |
+| <b> Denoising</b> |
 
 <br/>
 <br/>
