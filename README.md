@@ -145,7 +145,7 @@ To reproduce all experiments from paper, run all the shell scripts in the folder
 
 **Generate Plots from paper**
 
-All experiments from paper have been compiled as  ```*.csv``` files in ```plot/csvs/``` to reproduce plots from paper. Plots and their generating codes have been provided in ```plots.ipynb``` notebook.
+All experiments from paper have been compiled as  ```*.csv``` files in ```plot/csv/``` to reproduce plots from paper. Plots and their generating codes have been provided in ```plots.ipynb``` notebook.
 
 <br/>
 <br/>
