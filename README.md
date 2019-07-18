@@ -90,8 +90,7 @@ The weights of Glow and DCGAN will be saved in ``` trained_models/{data}/glow/``
 <br/>
 <br/>
 
->  Pre-trained models, used in the paper, can be downloaded from [add link here](). 
-
+>  Pre-trained models, used in the paper, can be downloaded from [add link here](). Additionally, to run lasso-wavelet experiments for compressive sensing, download this [npy]() file and place in ```solvers/lasso_utils/``` directory.
 
 <br/>
 <br/>
