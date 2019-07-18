@@ -86,9 +86,9 @@ python train_dcgan.py -dataset flowers
 
 The weights of Glow and DCGAN will be saved in ``` trained_models/{data}/glow/``` and  ```trained_models/{data}/dcgan/```. 
 
-
-
-
+<br/>
+<br/>
+<br/>
 
 >  Pre-trained models, used in the paper, can be downloaded from [add link here](). 
 
