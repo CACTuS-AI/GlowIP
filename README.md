@@ -116,7 +116,9 @@ python solve_inpainintg.py -experiment exp3 -dataset celeba -prior glow -model c
 
 The results of each experiment will be saved in the ```results``` directory. 
 
-
+<br/>
+<br/>
+<br/>
 
 > Pre-computed results can be downloaded from [add link here](). 
 
