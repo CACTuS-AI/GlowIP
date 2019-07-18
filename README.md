@@ -6,7 +6,7 @@ Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **
 In this paper, we demonstrate that an invertible generative model, specifically GLOW, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.
 
 
-| ![image](./images/cs_plot.png) | ![image](./images/denoising_plot.png) | 
+| ![image](./images/cs_plot.png) | ![image](./images/denoising_plot.png) |
 | :---: | :---: |
 | <b> Compressive Sensing </b> | <b> Denoising </b> |
 
@@ -31,9 +31,11 @@ cd data/
 # prepare celeba
 ./setup_celeba.sh
 python process_celeba.py
+
 # prepare birds
 ./setup_birds.sh
 python process_birds.py
+
 # prepare flowers
 ./setup_flowers.sh
 python process_flowers.py
@@ -52,14 +54,19 @@ To train generative models, simply run the ```train_{model}.py``` file from the 
 ```shell
 # train glow on celeba
 python train_glow.py -dataset celeba
+
 # train dcgan on celeba
 python train_dcgan.py -dataset celeba
+
 # train glow on birds
 python train_glow.py -dataset birds
+
 # train dcgan on birds
 python train_dcgan.py -dataset birds
+
 # train glow on flowers
 python train_glow.py -dataset flowers
+
 # train dcgan on flowers
 python train_dcgan.py -dataset flowers
 ```
@@ -85,9 +92,11 @@ The weights of Glow and DCGAN will be saved in ``` trained_models/{data}/glow/``
 # run denoising for celeba using dcgan as prior at noise level 0.1 and gamma 0 
 python solve_denoising.py -experiment exp1 -dataset celeba -prior dcgan -model celeba \
 -noise_std 0.1 -gamma 0 -init_std 0.1 -device cuda
+
 # run cs for out-of-distribution (ood) images using glow as prior at m=5000 with gamma=0 
 python solve_cs.py -experiment exp2 -dataset ood -prior glow -model celeba \
 -m 5000 -gamma 0 -init_std 0 -device cuda
+
 # run inpainting for celeba using glow as prior with gamma set to 0
 python solve_inpainintg.py -experiment exp3 -dataset celeba -prior glow -model celeba \
 -gamma 0 -init_std 0 -device cuda
@@ -112,6 +121,7 @@ To reproduce all experiments from paper, run all the shell scripts in the folder
 ```shell
 # reproduce results of cs on out-of-distribution (ood) using glow prior
 ./run/run_ood_cs_glow_main.sh
+
 # reproduce results of denoising on celeba using glow prior at noise level 0.1
 ./run/run_celeba_denoising_glow_noisestd_0.10.sh
 ```
