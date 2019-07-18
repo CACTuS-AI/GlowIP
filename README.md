@@ -38,7 +38,9 @@ In this paper, we demonstrate that an invertible generative model, specifically 
   </tr>
 </table> 
 
-
+<br/>
+<br/>
+<br/>
 
 **Prepare Datasets**
 
@@ -59,7 +61,9 @@ python process_flowers.py
 
 The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories. Test Images, used in the paper, are placed in the directory ```test_images```. These were randomly extracted from the validation set of these processed datasets.
 
-
+<br/>
+<br/>
+<br/>
 
 **Training Generative Models**
 
@@ -89,7 +93,9 @@ The weights of Glow and DCGAN will be saved in ``` trained_models/{data}/glow/``
 >  Pre-trained models, used in the paper, can be downloaded from [add link here](). 
 
 
-
+<br/>
+<br/>
+<br/>
 
 
 **Solving Inverse Problems**
@@ -114,20 +120,25 @@ The results of each experiment will be saved in the ```results``` directory.
 
 > Pre-computed results can be downloaded from [add link here](). 
 
-
+<br/>
+<br/>
+<br/>
 
 **Run all experiments from paper**
 
 To reproduce all experiments from paper, run all the shell scripts in the folder ```run/``` from the root directory of the project.
 
-
+<br/>
+<br/>
+<br/>
 
 **Generate Plots from paper**
 
 All experiments from paper have been compiled as  ```*.csv``` files in ```plot/csvs/``` to reproduce plots from paper. Plots and their generating codes have been provided in ```plots.ipynb``` notebook.
 
-
-
+<br/>
+<br/>
+<br/>
 
 
 **Dependencies**
