@@ -1,0 +1,17 @@
+python solve_cs.py \
+-prior dcgan \
+-experiment ood_cs_dcgan \
+-dataset ood \
+-model celeba \
+-m     10000 7500 5000 2500 1000 \
+-gamma 0     0 	  0    0    0   \
+-optim lbfgs \
+-lr 1 \
+-steps 20 \
+-batchsize 12 \
+-size 64 \
+-device cuda \
+-init_strategy random \
+-init_std 0.1 \
+-save_metrics_text True \
+-save_results True

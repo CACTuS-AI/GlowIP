@@ -1,0 +1,17 @@
+python solve_cs.py \
+-prior glow \
+-experiment ood_cs_glow \
+-dataset ood \
+-model celeba \
+-m     10000 7500 5000 2500 1000 \
+-gamma 0     0    0    0    0 \
+-optim lbfgs \
+-lr 0.1 \
+-steps 30 \
+-batchsize 6 \
+-size 64 \
+-device cuda \
+-init_strategy random \
+-init_std 0.0 \
+-save_metrics_text True \
+-save_results True
