@@ -32,10 +32,9 @@ def trainGlow(args):
         os.makedirs(save_path)
     
     
-    # loading pre-trained model to resume trainign
+    # loading pre-trained model to resume training
     if os.path.exists(save_path+"/glowmodel.pt"):
-        print("loading previous model to resume training ...")
-        print("loading saved configs from folder")
+        print("loading previous model and saved configs to resume training ...")
         with open(config_path, 'r') as f:
             configs = json.load(f)
         glow = Glow((3,configs["size"],configs["size"]),
@@ -45,9 +44,9 @@ def trainGlow(args):
                     nn_init_last_zeros=configs["last_zeros"],
                     device=args.device)
         glow.load_state_dict(torch.load(save_path+"/glowmodel.pt"))
-        print("pre-trained model loaded and configs loaded successfully")
+        print("pre-trained model and configs loaded successfully")
         glow.set_actnorm_init()
-        print("actnorm initialized flag set to True to avoid data dependant re-initialization")
+        print("actnorm initialization flag set to True to avoid data dependant re-initialization")
         glow.train()
     
     else:
@@ -98,6 +97,7 @@ def trainGlow(args):
             # computing loss: "nll"
             n,c,h,w = x.size()
             nll,logdet,logpz,z_mu,z_std = glow.nll_loss(x)
+            # skipping first batch due to data dependant initialization (if not initialized)
             if global_step == 0:
                 global_step += 1
                 continue
@@ -105,7 +105,7 @@ def trainGlow(args):
             nll.backward()
             torch.nn.utils.clip_grad_value_(glow.parameters(), 5)
             grad_norm = torch.nn.utils.clip_grad_norm_(glow.parameters(), 100)
-            # linearly increase learning rate till warmup_iter upto lr
+            # linearly increase learning rate till warmup_iter upto args.lr
             if global_step <= args.warmup_iter:
                 warmup_lr = args.lr / args.warmup_iter * global_step
                 for params in opt.param_groups:
@@ -116,10 +116,10 @@ def trainGlow(args):
             if global_step > args.warmup_iter:
                 lr_scheduler.step(nll)
                 if not warmup_completed:
-                    if args.args.warmup_iter == 0:
+                    if args.warmup_iter == 0:
                         print("no model warming...")
                     else:
-                        print("\nWarm up Completed")
+                        print("\nwarm up completed")
                 warmup_completed = True
             # printing training metrics 
             print("\repoch=%0.2d..nll=%0.2f..logdet=%0.2f..logpz=%0.2f..mu=%0.2f..std=%0.2f..gradnorm=%0.2f"
