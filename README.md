@@ -191,3 +191,20 @@ python align_faces/align_faces.py -input {path_to_image} -output {path_to_output
 13. glob
 14. pandas
 15. tqdm
+
+
+
+**Citation**
+
+If you find our work useful in your research or publication, please cite it:
+
+```
+@article{asim2019invertible,
+  title={Invertible generative models for inverse problems: mitigating representation error and dataset bias},
+  author={Asim, Muhammad and Ahmed, Ali and Hand, Paul},
+  journal={arXiv preprint arXiv:1905.11672},
+  year={2019}
+}
+
+```
+
