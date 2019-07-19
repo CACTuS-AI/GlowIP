@@ -192,7 +192,9 @@ python align_faces/align_faces.py -input {path_to_image} -output {path_to_output
 14. pandas
 15. tqdm
 
-
+<br/>
+<br/>
+<br/>
 
 **Citation**
 
