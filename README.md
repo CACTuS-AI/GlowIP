@@ -144,10 +144,6 @@ All experiments from paper have been compiled as  ```*.csv``` files in ```plot/c
 
 To run experiments on any custom set of images, simply place the new set of images in the ```test_images``` folder with directory hierarchy matching the other image folders. The folder structure should be like  ```test_images/{custom}/imgs/```.  See example below.
 
-<br/>
-<br/>
-<br/>
-
 ```shell
 # run cs on custom images using glow trained on celeba for m=5000 and gamma=0
 python solve_cs.py -experiment exp4 -dataset {custom} -prior glow -model celeba \
@@ -169,10 +165,6 @@ python solve_cs.py -experiment exp4 -dataset {custom} -prior glow -model celeba 
 **Align Face Images**
 
 First download this [file](https://drive.google.com/file/d/1mVsa7eImKyFOMtlDCbfV-rfPV_nxs9xr/view?usp=sharing) and place in ```align_faces/```  directory. To align face images, simply run ```align_faces/align_face.py``` as shown below.
-
-<br/>
-<br/>
-<br/>
 
 ```shell
 python align_faces/align_faces.py -input {path_to_image} -output {path_to_output}
