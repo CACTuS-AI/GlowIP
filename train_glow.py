@@ -181,7 +181,7 @@ if __name__ == "__main__":
     parser.add_argument('-L',type=int,help='no. of time squeezing is performed',default=4)
     parser.add_argument('-coupling',type=str,help='type of coupling layer to use',default='affine')
     parser.add_argument('-last_zeros',type=bool,help='whether to initialize last layer ot NN with zeros',default=True)
-    parser.add_argument('-batchsize',type=bool,help='batch size for training',default=6)
+    parser.add_argument('-batchsize',type=int,help='batch size for training',default=6)
     parser.add_argument('-size',type=int,help='images will be resized to this dimension',default=64)
     parser.add_argument('-lr',type=float,help='learning rate for training',default=1e-4)
     parser.add_argument('-n_bits_x',type=int,help='requantization of training images',default=5)
