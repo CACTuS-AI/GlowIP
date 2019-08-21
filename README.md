@@ -108,12 +108,6 @@ The results of each experiment will be saved in the ```results``` directory.
 <br/>
 <br/>
 
-> Pre-computed results can be downloaded from [add link here](). 
-
-<br/>
-<br/>
-<br/>
-
 **Run all experiments from paper**
 
 To reproduce all experiments from paper, run all the shell scripts in the folder ```run/``` from the root directory of the project. For example,
