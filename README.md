@@ -24,7 +24,7 @@ In this paper, we demonstrate that an invertible generative model, specifically 
 
 **Prepare Datasets**
 
-To prepare training and validation dataset for celebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```proceess_{data}.py``` will then pre-process and split each data into training and validation sets used in the paper.  
+To prepare training and validation dataset for celebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets used in the paper.  
 
 ```shell
 cd data/
