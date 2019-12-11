@@ -46,7 +46,7 @@ class NN(nn.Module):
             
     def forward(self, x):
         x = self.conv1(x)
-        x, _, _ = self.actnorm1(x, logdet=0, reverse=False) 
+        x, _, _ = self.actnorm1(x, logdet=0, reverse=False) # these actnorms never run in reverse mode, even if the network is in reverse mode
         x = F.relu(x)
         x = self.conv2(x)
         x, _, _ = self.actnorm2(x, logdet=0, reverse=False) 

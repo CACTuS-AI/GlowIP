@@ -160,7 +160,8 @@ def GlowCS(args):
             if args.optim == "adam":
                 optimizer = torch.optim.Adam([z_sampled], lr=args.lr,)
             elif args.optim == "lbfgs":
-                optimizer = torch.optim.LBFGS([z_sampled], lr=args.lr,)
+                # when using mean of pixelwise error rather than sum, the norm of gradients becomes small enough that LBFGS will ignore them by default - decreasing tolerance_grad prevents this
+                optimizer = torch.optim.LBFGS([z_sampled], lr=args.lr, tolerance_grad=0)
             else:
                 raise "optimizer not defined"
             
@@ -179,7 +180,9 @@ def GlowCS(args):
                     y_true      = torch.matmul(x_test_flat, A) + noise
                     y_gen       = torch.matmul(x_gen_flat, A) 
                     global residual_t
-                    residual_t = ((y_gen - y_true)**2).sum(dim=1).mean()
+                    # original error is computed as a sum over all measurement dims
+                    # using the mean instead prevents crashes, but it seems the only real change is that it scales the norm of the gradients by a constant
+                    residual_t = ((y_gen - y_true)**2).mean()
                     z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
@@ -347,7 +350,7 @@ def GANCS(args):
             if args.optim == "adam":
                 optimizer = torch.optim.Adam([z_sampled], lr=args.lr,)
             elif args.optim == "lbfgs":
-                optimizer = torch.optim.LBFGS([z_sampled], lr=args.lr,)
+                optimizer = torch.optim.LBFGS([z_sampled], lr=args.lr)
             residual  = []
             for t in range(args.steps):
                 def closure():
