@@ -102,6 +102,8 @@ python solve_inpainintg.py -experiment exp3 -dataset celeba -prior glow -model c
 -gamma 0 -init_std 0 -device cuda
 ```
 
+**Please Note**: By default, inverse problems are solved in batches of 6 images. This may require more memory than available on certain hardware. With batch size set to 1, the model may crash early while solving the inverse problem, due to numerical instability. In this case, please try reducing the learning rate, or setting the batch size to 2-3 images.
+
 The results of each experiment will be saved in the ```results``` directory. 
 
 <br/>
