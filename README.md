@@ -102,9 +102,23 @@ python solve_inpainintg.py -experiment exp3 -dataset celeba -prior glow -model c
 -gamma 0 -init_std 0 -device cuda
 ```
 
-**Please Note**: By default, inverse problems are solved in batches of 6 images. This may require more memory than available on certain hardware. With batch size set to 1, the model may crash early while solving the inverse problem, due to numerical instability. In this case, please try reducing the learning rate, or setting the batch size to 2-3 images.
-
 The results of each experiment will be saved in the ```results``` directory. 
+
+**Please Note**: By default, inverse problems are solved in batches of 6 images. This may require more memory than available on certain hardware. With batch size set to 1, the model may crash early while solving the inverse problem, due to numerical instability. In this case, please try reducing the learning rate and increasing the number of training iterations, or try setting the batch size to 2-3 images. See the following examples:
+```shell
+# compressive sensing
+python solve_cs.py -experiment exp1 -dataset celeba -prior glow -model celeba -m 12288 \
+-lr 0.05 -gamma 0 -init_std 0 -batchsize 1 -steps 50
+
+# denoising - with gamma > 0, the latent norm is encouraged not to blow up, and the default parameters are stable.
+python solve_denoising.py -prior glow -experiment exp2 -dataset celeba -model celeba \
+-gamma 0.75 -batchsize 1
+
+# inpainting
+python solve_inpainting.py -experiment exp3 -dataset celeba -prior glow -model celeba \
+-lr 0.01 -gamma 0 -init_std 0 -batchsize 1 -steps 50
+```
+
 
 <br/>
 <br/>
