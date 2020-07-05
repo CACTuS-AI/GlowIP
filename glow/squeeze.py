@@ -13,29 +13,49 @@ else:
 class Squeeze(nn.Module):
     
     
-    def __init__(self, factor):
+    def __init__(self, factor, contiguous=False):
         super(Squeeze, self).__init__()
         self.factor = factor
+        self.contiguous = contiguous
     
         
     def forward(self, x, logdet=None, reverse=False):
         n,c,h,w  = x.size()
-        
-        if not reverse:
-            if self.factor == 1:
+
+        if(self.contiguous):
+            if not reverse:
+                if self.factor == 1:
+                    return x, logdet
+                # squeezing is done in one line unlike the original code
+                assert h % self.factor == 0 and w % self.factor == 0, "h,w not divisible by factor: h=%d, factor=%d"%(h,self.factor)
+                x = x.view(n, c*self.factor*self.factor, h//self.factor, w//self.factor)
                 return x, logdet
-            # squeezing is done in one line unlike the original code
-            assert h % self.factor == 0 and w % self.factor == 0, "h,w not divisible by factor: h=%d, factor=%d"%(h,self.factor)
-            x = x.view(n, c*self.factor*self.factor, h//self.factor, w//self.factor)
-            return x, logdet
-        
-        if reverse: 
-            if self.factor == 1:
+            elif reverse:
+                if self.factor == 1:
+                    return x
+                assert c % self.factor**2 == 0, "channels not divisible by factor squared"
+                # unsqueezing is also done in one line unlike the original code
+                x = x.view(n, c //(self.factor**2), h*self.factor, w* self.factor)
                 return x
-            assert c % self.factor**2 == 0, "channels not divisible by factor squared"
-            # unsqueezing is also done in one line unlike the original code
-            x = x.view(n, c //(self.factor**2), h*self.factor, w* self.factor)
-            return x
+        else:
+            if not reverse:
+                if self.factor == 1:
+                    return x, logdet
+                assert h % self.factor == 0 and w % self.factor == 0, "h,w not divisible by factor: h=%d, factor=%d" % (
+                h, self.factor)
+                x = x.reshape(n, c, h // self.factor, self.factor, w // self.factor, self.factor)
+                x = x.permute(0, 1, 3, 5, 2, 4)  # it seems this permutation works in nchw and nhwc
+                x = x.reshape(n, c * self.factor * self.factor, h // self.factor, w // self.factor)
+                return x, logdet
+            elif reverse:
+                if self.factor == 1:
+                    return x
+                assert c % self.factor ** 2 == 0, "channels not divisible by factor squared"
+                x = x.reshape(n, c // (self.factor ** 2), self.factor, self.factor, h, w)
+                x = x.permute(0, 1, 4, 2, 5, 3)
+                x = x.reshape(n, c // (self.factor ** 2), h * self.factor, w * self.factor)
+                return x
+
     
     
     
