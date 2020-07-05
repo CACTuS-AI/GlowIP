@@ -14,7 +14,7 @@ In this paper, we demonstrate that an invertible generative model, specifically 
 | <b> Compressive Sensing</b>: PSNR for 64px compressive sensing recoveries for in- and out-of-distribution images. |
 
 | <img src="./images/celeba_denoising_s=0,1_z2.png" width=700px/> | <img src="./images/celeba_m=7500_md_panel.png" width=700px /> |
-| :---: | :---: |a
+| :---: | :---: |
 | <b>Denoising</b>: qualitative results for 64px in-distribution denoising. | <b>Compressive Sensing</b>: qualitative results for 128px in-distribution compressive sensing, here with approximately 25% measurements.
 <br/>
 <br/>
