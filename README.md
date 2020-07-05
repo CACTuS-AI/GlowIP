@@ -9,13 +9,13 @@ In this paper, we demonstrate that an invertible generative model, specifically 
 
 | ![image](./images/denoising_plot_s0.1,0.2.png) |
 | :---: |
-| <b> Denoising </b>: PSNR for $64$px image denoising at the noise level $\sigma$. |
+| <b> Denoising</b>: PSNR for 64px image denoising at the noise level <img src="https://render.githubusercontent.com/render/math?math=\sigma">. |
 | ![image](./images/cs_plot_64px.png) |
-| <b> Compressive Sensing </b>: PSNR for $64$px compressive sensing recoveries for in- and out-of-distribution images. |
+| <b> Compressive Sensing</b>: PSNR for 64px compressive sensing recoveries for in- and out-of-distribution images. |
 
 | <img src="./images/celeba_denoising_s=0,1_z2.png" width=700px/> | <img src="./images/celeba_m=7500_md_panel.png" width=700px /> |
-| :---: | :---: |
-| <b>Denoising</b>: qualitative results for $64$px in-distribution denoising. | <b>Compressive Sensing</b>: qualitative results for $128$px in-distribution compressive sensing, here with $m=7500 (\approx 25\%)$ measurements.
+| :---: | :---: |a
+| <b>Denoising</b>: qualitative results for 64px in-distribution denoising. | <b>Compressive Sensing</b>: qualitative results for 128px in-distribution compressive sensing, here with approximately 25% measurements.
 <br/>
 <br/>
 <br/>
@@ -41,7 +41,7 @@ python process_flowers.py
 
 The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories.
 
-We present results mainly for images from the CelebA validation set and from [Flickr-Faces-HQ](https://github.com/NVlabs/ffhq-dataset). We present additional results for a random selection of out-of-distribution qualitative images "in the wild." All test sets used in our experiments are available in the directory ```test_images```. 
+We present results mainly for images from the CelebA validation set and from [Flickr-Faces-HQ](https://github.com/NVlabs/ffhq-dataset), along with additional results for a random selection of out-of-distribution qualitative images "in the wild." All test sets used in our experiments are available in the directory ```test_images```. 
 
 
 <br/>
