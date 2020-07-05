@@ -22,7 +22,7 @@ In this paper, we demonstrate that an invertible generative model, specifically 
 
 **Prepare Training Datasets**
 
-To prepare training and validation datasets for CelebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets.  
+To prepare training and validation datasets for [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), [Caltech-UCSD Birds 200](http://www.vision.caltech.edu/visipedia/CUB-200.html), and the [Oxford Flowers dataset](https://www.robots.ox.ac.uk/~vgg/data/flowers/), move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets.  
 
 ```shell
 cd data/
@@ -39,7 +39,10 @@ python process_birds.py
 python process_flowers.py
 ```
 
-The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories. Test Images, used in the paper, are placed in the directory ```test_images```. These were randomly extracted from the validation set of these processed datasets.
+The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories.
+
+We present results mainly for images from the CelebA validation set and from [Flickr-Faces-HQ](https://github.com/NVlabs/ffhq-dataset). We present additional results for a random selection of out-of-distribution qualitative images "in the wild." All test sets used in our experiments are available in the directory ```test_images```. 
+
 
 <br/>
 <br/>
