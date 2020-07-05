@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import os
 import json
 import argparse
-
+import re
+from collections import defaultdict
 
 def trainGlow(args):
     save_path   = "./trained_models/%s/glow"%args.dataset
@@ -26,7 +27,11 @@ def trainGlow(args):
                    "lr": args.lr,
                    "n_bits_x":args.n_bits_x,
                    "warmup_iter":args.warmup_iter}
-    
+
+    if(args.squeeze_contig):
+        configs["squeeze_contig"] = True
+    if(args.coupling_bias > 0):
+        configs["coupling_bias"] = args.coupling_bias
     if not os.path.exists(save_path):
         print("creating directory to save model weights")
         os.makedirs(save_path)
@@ -37,12 +42,7 @@ def trainGlow(args):
         print("loading previous model and saved configs to resume training ...")
         with open(config_path, 'r') as f:
             configs = json.load(f)
-        glow = Glow((3,configs["size"],configs["size"]),
-                    K=configs["K"],L=configs["L"],
-                    coupling=configs["coupling"],
-                    n_bits_x=configs["n_bits_x"],
-                    nn_init_last_zeros=configs["last_zeros"],
-                    device=args.device)
+        glow = Glow((3,configs["size"],configs["size"]), device=args.device, **configs)
         glow.load_state_dict(torch.load(save_path+"/glowmodel.pt"))
         print("pre-trained model and configs loaded successfully")
         glow.set_actnorm_init()
@@ -64,7 +64,8 @@ def trainGlow(args):
     
     # setting up dataloader
     print("setting up dataloader for the training data")
-    trans      = transforms.Compose([transforms.Resize((args.size,args.size)), 
+    trans      = transforms.Compose([transforms.Resize(args.size),
+                                     transforms.CenterCrop((args.size, args.size)),
                                      transforms.ToTensor()])
     dataset    = datasets.ImageFolder(training_folder, transform=trans)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=args.batchsize,
@@ -143,7 +144,7 @@ def trainGlow(args):
                             x_gen = x_gen[...,0]
                         if not os.path.exists(save_path+"/samples_training"):
                             os.makedirs(save_path+"/samples_training")
-                        x_gen = (x_gen * 255).astype("uint8")
+                        x_gen = (np.clip(x_gen, 0, 1) * 255).astype("uint8")
                         sio.imsave(save_path+"/samples_training/%0.6d.jpg"%global_step, x_gen )
             except:
                 print("\n failed to sample from glow at global step = %d"%global_step)
@@ -181,7 +182,7 @@ if __name__ == "__main__":
     parser.add_argument('-L',type=int,help='no. of time squeezing is performed',default=4)
     parser.add_argument('-coupling',type=str,help='type of coupling layer to use',default='affine')
     parser.add_argument('-last_zeros',type=bool,help='whether to initialize last layer ot NN with zeros',default=True)
-    parser.add_argument('-batchsize',type=int,help='batch size for training',default=6)
+    parser.add_argument('-batchsize',type=int,help='batch size for training',default=3)
     parser.add_argument('-size',type=int,help='images will be resized to this dimension',default=64)
     parser.add_argument('-lr',type=float,help='learning rate for training',default=1e-4)
     parser.add_argument('-n_bits_x',type=int,help='requantization of training images',default=5)
@@ -189,6 +190,8 @@ if __name__ == "__main__":
     parser.add_argument('-warmup_iter',type=int,help='no. of warmup iterations',default=10000)
     parser.add_argument('-sample_freq',type=int,help='sample after every save_freq',default=50)
     parser.add_argument('-save_freq',type=int,help='save after every save_freq',default=1000)
+    parser.add_argument('-coupling_bias', type=float,help='additive bias to the scale parameter of each affine coupling layer to prevent division by eps', default=0)
+    parser.add_argument('-squeeze_contig', action="store_true", help="whether to select contiguous components of activations in each squeeze layer")
     parser.add_argument('-device',type=str,help='whether to use',default="cuda")    
     args = parser.parse_args()
     trainGlow(args)
