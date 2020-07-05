@@ -1,30 +1,28 @@
 # GlowIP
-Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Ali Ahmed and Paul Hand.
+Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Max Daniels, Ali Ahmed, Oscar Leong, and Paul Hand.
 
 
 
 In this paper, we demonstrate that an invertible generative model, specifically GLOW, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.
 
 
-| ![image](./images/cs_plot.png) | ![image](./images/denoising_plot.png) |
+
+| ![image](./images/denoising_plot_s0.1,0.2.png) |
+| :---: |
+| <b> Denoising </b>: PSNR for $64$px image denoising at the noise level $\sigma$. |
+| ![image](./images/cs_plot_64px.png) |
+| <b> Compressive Sensing </b>: PSNR for $64$px compressive sensing recoveries for in- and out-of-distribution images. |
+
+| <img src="./images/celeba_denoising_s=0,1_z2.png" width=700px/> | <img src="./images/celeba_m=7500_md_panel.png" width=700px /> |
 | :---: | :---: |
-| <b> Compressive Sensing </b> | <b> Denoising </b> |
-
-| ![image](./images/cs_visual_m750.jpg) |
-| :---: |
-| <b>Compressive Sensing at m=750 (6%) measurements</b> |
-
-| ![image](./images/denoising_visual.jpg) |
-| :---: |
-| <b> Denoising</b> |
-
+| <b>Denoising</b>: qualitative results for $64$px in-distribution denoising. | <b>Compressive Sensing</b>: qualitative results for $128$px in-distribution compressive sensing, here with $m=7500 (\approx 25\%)$ measurements.
 <br/>
 <br/>
 <br/>
 
-**Prepare Datasets**
+**Prepare Training Datasets**
 
-To prepare training and validation dataset for celebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets used in the paper.  
+To prepare training and validation datasets for CelebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets.  
 
 ```shell
 cd data/
