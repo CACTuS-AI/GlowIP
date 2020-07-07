@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 from .actnorm import ActNorm
-from .invertibe_conv import InvertibleConvolution
+from .invertible_conv import InvertibleConvolution
 from .coupling import CouplingLayer
 
 # device
