@@ -1,6 +1,7 @@
 """Estimators for compressed sensing"""
 # pylint: disable = C0301, C0103, C0111, R0914
 
+from tqdm import trange
 import copy
 import heapq
 import numpy as np
@@ -18,57 +19,86 @@ def idct2(image_channel):
     return fftpack.idct(fftpack.idct(image_channel.T, norm='ortho').T, norm='ortho')
 
 
-def vec(channels):
-    image = np.zeros((64, 64, 3))
+def vec(channels, s=64):
+    image = np.zeros((s, s, 3))
     for i, channel in enumerate(channels):
         image[:, :, i] = channel
     return image.reshape([-1])
 
 
-def devec(vector):
-    image = np.reshape(vector, [64, 64, 3])
+def devec(vector, s=64):
+    image = np.reshape(vector, [s, s, 3])
     channels = [image[:, :, i] for i in range(3)]
     return channels
 
 
-def wavelet_basis(path='./solvers/lasso_utils/wavelet_basis.npy'):
-    W_ = np.load(path)
+def wavelet_basis(s=64):
+    if(s==64):
+        try:
+            W_ = np.load('./solvers/lasso_utils/wavelet_basis_64.npy')
+        except FileNotFoundError:
+            raise FileNotFoundError("Could not find ./solvers/lasso_utils/wavelet_basis_64.npy. Have you run ./solvers/wavelet_basis.py to generate this?")
+    elif(s==128):
+        try:
+            W_ = np.load('./solvers/lasso_utils/wavelet_basis_128.npy')
+        except FileNotFoundError:
+            raise FileNotFoundError("Could not find ./solvers/lasso_utils/wavelet_basis_128.npy. Have you run ./solvers/wavelet_basis.py to generate this?")
+    else:
+        raise ValueError("Size parameter must be either 64 or 128")
     # W_ initially has shape (4096,64,64), i.e. 4096 64x64 images
     # reshape this into 4096x4096, where each row is an image
     # take transpose to make columns images
-    W_ = W_.reshape((4096, 4096))
-    W = np.zeros((12288, 12288))
+    W_ = W_.reshape((s*s, s*s))
+    W = np.zeros((s*s*3, s*s*3))
     W[0::3, 0::3] = W_
     W[1::3, 1::3] = W_
     W[2::3, 2::3] = W_
     return W
 
 
-def lasso_dct_estimator(hparams):  #pylint: disable = W0613
-    """LASSO with DCT"""
-    def estimator(A_val, y_batch_val, hparams):
-        # One can prove that taking 2D DCT of each row of A,
-        # then solving usual LASSO, and finally taking 2D ICT gives the correct answer.
-        A_new = copy.deepcopy(A_val)
-        for i in range(A_val.shape[1]):
-            A_new[:, i] = vec([dct2(channel) for channel in devec(A_new[:, i])])
+class lasso_dct_estimator():
+    def __init__(self, hparams, A):
+        self.hparams = hparams
+        self.A_DCT = A
+        for i in range(A.shape[1]):
+            self.A_DCT[:, i] = vec([dct2(channel) for channel in devec(self.A_DCT[:, i], s=hparams.size)], s=hparams.size)
 
+    def  __call__(self, y_batch_val, hparams):
         x_hat_batch = []
-        for j in range(hparams.batch_size):
+        for j in trange(hparams.batch_size):
             y_val = y_batch_val[j]
-            z_hat = utils.solve_lasso(A_new, y_val, hparams)
-            x_hat = vec([idct2(channel) for channel in devec(z_hat)]).T
+            z_hat = utils.solve_lasso(self.A_DCT, y_val, hparams)
+            x_hat = vec([idct2(channel) for channel in devec(z_hat, s=hparams.size)], s=hparams.size).T
             x_hat = np.maximum(np.minimum(x_hat, 1), -1)
             x_hat_batch.append(x_hat)
         return x_hat_batch
-    return estimator
+
+#def lasso_dct_estimator(hparams):  #pylint: disable = W0613
+#    """LASSO with DCT"""
+#    def estimator(A_val, y_batch_val, hparams):
+#        # One can prove that taking 2D DCT of each row of A,
+#        # then solving usual LASSO, and finally taking 2D ICT gives the correct answer.
+#        A_new = copy.deepcopy(A_val)
+#        for i in range(A_val.shape[1]):
+#            A_new[:, i] = vec([dct2(channel) for channel in devec(A_new[:, i], s=hparams.size)], s=hparams.size)
+#
+#        x_hat_batch = []
+#        for j in trange(hparams.batch_size):
+#            print("Solving lasso")
+#            y_val = y_batch_val[j]
+#            z_hat = utils.solve_lasso(A_new, y_val, hparams)
+#            x_hat = vec([idct2(channel) for channel in devec(z_hat, s=hparams.size)], s=hparams.size).T
+#            x_hat = np.maximum(np.minimum(x_hat, 1), -1)
+#            x_hat_batch.append(x_hat)
+#        return x_hat_batch
+#    return estimator
 
 
 def lasso_wavelet_estimator(hparams):  #pylint: disable = W0613
     """LASSO with Wavelet"""
     def estimator(A_val, y_batch_val, hparams):
         x_hat_batch = []
-        W = wavelet_basis()
+        W = wavelet_basis(s=hparams.size)
         WA = np.dot(W, A_val)
         for j in range(hparams.batch_size):
             y_val = y_batch_val[j]

@@ -14,8 +14,9 @@ else:
     device = "cpu"
 
 class Glow(nn.Module):
-    
-    def __init__(self, image_shape, K, L, coupling, device, n_bits_x=8, nn_init_last_zeros=False):
+    def __init__(self, image_shape, K, L,
+                 coupling, device, n_bits_x=8, coupling_bias=0,
+                 squeeze_contig=False, nn_init_last_zeros=False):
         super(Glow, self).__init__()
         self.image_shape = image_shape
         self.K            = K
@@ -25,18 +26,20 @@ class Glow(nn.Module):
         self.device       = device
         self.init_resizer = False
         self.nn_init_last_zeros = nn_init_last_zeros
-        
+        self.coupling_bias = coupling_bias
+        self.squeeze_contig = squeeze_contig
+
         # setting up layers
         c,w,h = image_shape
         self.glow_modules = nn.ModuleList()
         
         for l in range(L-1):
             # step of flows
-            squeeze = Squeeze(factor=2)
+            squeeze = Squeeze(factor=2, contiguous=self.squeeze_contig)
             c = c * 4
             self.glow_modules.append(squeeze)
             for k in range(K):
-                flow = Flow(c,self.coupling,device,nn_init_last_zeros)                
+                flow = Flow(c,self.coupling,device,self.coupling_bias,self.nn_init_last_zeros)
                 self.glow_modules.append(flow)
             split = Split()
             c = c // 2
@@ -166,7 +169,18 @@ class Glow(nn.Module):
                     self.glow_modules[i].actnorm.initialized = True
                     self.glow_modules[i].coupling.net.actnorm1.initialized = True
                     self.glow_modules[i].coupling.net.actnorm2.initialized = True
-                    
+
+    def cache_inv_conv(self):
+        for i in range( len(self.glow_modules) ):
+            module_name = self.glow_modules[i].__class__.__name__
+            if module_name == "InvertibleConvolution":
+                self.glow_modules[i].cache_inv_conv()
+
+    def reset_cache_conv(self):
+        for i in range( len(self.glow_modules) ):
+            module_name = self.glow_modules[i].__class__.__name__
+            if module_name == "InvertibleConvolution":
+                self.glow_modules[i].reset_cache_conv()
 
 if __name__ == "__main__":
     size = (16,3,64,64)

@@ -268,7 +268,10 @@ def GANDenoiser(args):
                     x_noisy     = x_test + noise
                     global residual_t
                     residual_t  = ((x_gen - x_noisy)**2).view(len(x_noisy),-1).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_unsquared:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    else:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())

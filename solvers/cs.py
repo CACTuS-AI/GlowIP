@@ -30,7 +30,6 @@ def solveCS(args):
     else:
         raise "prior not defined correctly"
 
-
 def GlowCS(args):
     if args.init_norms == None:
         args.init_norms = [None]*len(args.m)
@@ -180,7 +179,10 @@ def GlowCS(args):
                     y_gen       = torch.matmul(x_gen_flat, A) 
                     global residual_t
                     residual_t = ((y_gen - y_true)**2).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_squared:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
+                    else:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())
@@ -360,7 +362,10 @@ def GANCS(args):
                     y_gen       = torch.matmul(x_gen_flat, A) 
                     global residual_t
                     residual_t  = ((y_gen - y_true)**2).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_unsquared:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    else:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())
@@ -427,68 +432,69 @@ def GANCS(args):
             np.save(save_path+"/residual_curve.npy", Residual_Curve)                
             np.save(save_path+"/original.npy", Original)
             np.save(save_path+"/recovered.npy", Recovered)
-    
+
 
 def WVTCS(args):
-    loopOver = zip(args.m, args.gamma)    
-    for m,gamma in loopOver:
-        n                  = args.size*args.size*3
-        test_folder        = "./test_images/%s/imgs"%args.dataset
-        save_path          = "./results/%s/%s"%(args.dataset,args.experiment)
-        divide_by          = 255                    # "max" or 255 or None
+    loopOver = zip(args.m, args.gamma)
+    for m, gamma in loopOver:
+        n = args.size * args.size * 3
+        test_folder = "./test_images/%s" % args.dataset
+        save_path = "./results/%s_%s/%s" % (args.dataset, args.size, args.experiment)
+        divide_by = 255  # "max" or 255 or None
         # loading test images
-        x_test    = [PIL.Image.open(p) for p in glob(test_folder+"/*")]
-        file_names = [name.split("/")[-1] for name in glob(test_folder+"/*")]
-        x_test    = [ img.resize((args.size,args.size),PIL.Image.BILINEAR) for img in x_test]
-        x_test    = [np.array(img) for img in x_test]
-        x_test    = np.array(x_test)
+        print("Loading test images...")
+        x_test = [PIL.Image.open(p).convert('RGB') for p in glob(test_folder + "/*/*")]
+        file_names = [name.split("/")[-1] for name in glob(test_folder + "/*/*")]
+        x_test = [img.resize((args.size, args.size), PIL.Image.BILINEAR) for img in x_test]
+        x_test = [np.array(img) for img in x_test]
+        x_test = np.array(x_test)
         # normalizing images
         if divide_by == "max":
-            x_test = x_test / x_test.max(axis=(1,2,3),keepdims=True)
+            x_test = x_test / x_test.max(axis=(1, 2, 3), keepdims=True)
         elif divide_by == 255:
             x_test = x_test / 255
         elif divide_by == None:
             pass
-        n_test    = x_test.shape[0]
+        n_test = x_test.shape[0]
         # arg parser to pass to solver methods
-        new_args  = {"batch_size":n_test, "lmbd":gamma,"lasso_solver":"sklearn"}
-        new_args  = easydict.EasyDict(new_args)    
+        new_args = {"batch_size": n_test, "lmbd": gamma, "lasso_solver": "sklearn", "size": args.size}
+        new_args = easydict.EasyDict(new_args)
         estimator = celebA_estimators.lasso_wavelet_estimator(new_args)
-        A = np.random.normal(0,1/np.sqrt(m), size=(n,m))
+        A = np.random.normal(0, 1 / np.sqrt(m), size=(n, m))
         # adding noise
-        if  args.noise == "random_bora":
-            noise = np.random.normal(0,1,size=(n_test,m))
-            noise = noise * 0.1/np.sqrt(m)
+        if args.noise == "random_bora":
+            noise = np.random.normal(0, 1, size=(n_test, m))
+            noise = noise * 0.1 / np.sqrt(m)
         else:
-            noise = np.random.normal(0,1,size=(n_test,m))
-            noise = noise / (np.linalg.norm(noise,2,axis=-1, keepdims=True)) * float(args.noise) 
-        y_true    = np.matmul(x_test.reshape(n_test,-1), A) + noise
-        x_hat     = estimator(np.sqrt(2*m)*A, np.sqrt(2*m)*y_true, new_args)
-        x_hat     = np.array(x_hat)
-        x_hat     = x_hat.reshape(-1,64,64,3)
-        
-        x_hat = np.clip(x_hat,0,1)
-        
-        psnr = [compare_psnr(x,xhat) for x,xhat in zip(x_test,x_hat)]
-    
+            noise = np.random.normal(0, 1, size=(n_test, m))
+            noise = noise / (np.linalg.norm(noise, 2, axis=-1, keepdims=True)) * float(args.noise)
+        y_true = np.matmul(x_test.reshape(n_test, -1), A) + noise
+        x_hat = estimator(np.sqrt(2 * m) * A, np.sqrt(2 * m) * y_true, new_args)
+        x_hat = np.array(x_hat)
+        x_hat = x_hat.reshape(-1, args.size, args.size, 3)
+
+        x_hat = np.clip(x_hat, 0, 1)
+
+        psnr = [compare_psnr(x, xhat) for x, xhat in zip(x_test, x_hat)]
+
         # print performance analysis
-        printout = "+-"*10 + "%s"%args.dataset + "-+"*10 + "\n"
-        printout = printout + "\t n_test    = %d\n"%len(x_hat)
-        printout = printout + "\t n         = %d\n"%n
-        printout = printout + "\t m         = %d\n"%m
+        printout = "+-" * 10 + "%s" % args.dataset + "-+" * 10 + "\n"
+        printout = printout + "\t n_test    = %d\n" % len(x_hat)
+        printout = printout + "\t n         = %d\n" % n
+        printout = printout + "\t m         = %d\n" % m
         printout = printout + "\t solver    = lasso_wavelet\n"
-        printout = printout + "\t gamma     = %0.8f\n"%gamma
-        printout = printout + "\t PSNR      = %0.3f\n"%np.mean(psnr)
+        printout = printout + "\t gamma     = %0.8f\n" % gamma
+        printout = printout + "\t PSNR      = %0.3f\n" % np.mean(psnr)
         print(printout)
-        
+
         if args.save_metrics_text:
-            with open("%s_cs_wvt_results.txt"%args.dataset,"a") as f:
+            with open("%s_cs_wvt_results.txt" % args.dataset, "a") as f:
                 f.write('\n' + printout)
-        
+
         # saving images
         if args.save_results:
             save_path_template = save_path + "/cs_m_%d_lasso_wavelet_gamma_%0.8f"
-            save_path = save_path_template%(m,gamma)           
+            save_path = save_path_template % (m, gamma)
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             else:
@@ -501,72 +507,75 @@ def WVTCS(args):
                     if not os.path.exists(save_path_2):
                         os.makedirs(save_path_2)
                         save_path = save_path_2
-                    
-            _ = [sio.imsave(save_path+"/"+name, x) for x,name in zip(x_hat,file_names)]
-#            _ = [sio.imsave(save_path+"/"+name.split(".")[0]+".jpg", x, quality=100) for x,name in zip(x_hat,file_names)]
-            np.save(save_path+"/original.npy", x_test)
-            np.save(save_path+"/recovered.npy", x_hat)
-            
+
+            _ = [sio.imsave(save_path + "/" + name, x) for x, name in zip(x_hat, file_names)]
+            #            _ = [sio.imsave(save_path+"/"+name.split(".")[0]+".jpg", x, quality=100) for x,name in zip(x_hat,file_names)]
+            np.save(save_path + "/original.npy", x_test)
+            np.save(save_path + "/recovered.npy", x_hat)
 
 
 def DCTCS(args):
-    loopOver = zip(args.m, args.gamma)    
-    for m,gamma in loopOver:
-        n                  = args.size*args.size*3
-        test_folder        = "./test_images/%s/imgs"%args.dataset
-        save_path          = "./results/%s/%s"%(args.dataset,args.experiment)
-        divide_by          = 255                    # "max" or 255 or None
+    loopOver = zip(args.m, args.gamma)
+    for m, gamma in loopOver:
+        n = args.size * args.size * 3
+        test_folder = "./test_images/%s" % args.dataset
+        save_path = "./results/%s/%s" % (args.dataset, args.experiment)
+
+        divide_by = 255  # "max" or 255 or None
         # loading test images
-        x_test    = [PIL.Image.open(p) for p in glob(test_folder+"/*")]
-        file_names = [name.split("/")[-1] for name in glob(test_folder+"/*")]
-        x_test    = [ img.resize((args.size,args.size),PIL.Image.BILINEAR) if (img.size[0]!=64) else img for img in x_test]
-        x_test    = [np.array(img) for img in x_test]
-        x_test    = np.array(x_test)
+        print("Loading test images...")
+        x_test = [PIL.Image.open(p).convert('RGB') for p in glob(test_folder + "/*/*")]
+        file_names = [name.split("/")[-1] for name in glob(test_folder + "/*/*")]
+        x_test = [img.resize((args.size, args.size), PIL.Image.BILINEAR) for img in x_test]
+        x_test = [np.array(img) for img in x_test]
+        x_test = np.array(x_test)
         # normalizing images
         if divide_by == "max":
-            x_test = x_test / x_test.max(axis=(1,2,3),keepdims=True)
+            x_test = x_test / x_test.max(axis=(1, 2, 3), keepdims=True)
         elif divide_by == 255:
             x_test = x_test / 255
         elif divide_by == None:
             pass
-        n_test    = x_test.shape[0]
+        n_test = x_test.shape[0]
         # arg parser to pass to solver methods
-        new_args  = {"batch_size":n_test, "lmbd":gamma,"lasso_solver":"sklearn"}
-        new_args  = easydict.EasyDict(new_args)    
-        estimator = celebA_estimators.lasso_dct_estimator(new_args)
-        A = np.random.normal(0,1/np.sqrt(m), size=(n,m))
+        new_args = {"batch_size": n_test, "lmbd": gamma, "lasso_solver": "sklearn", "size": args.size}
+        new_args = easydict.EasyDict(new_args)
+        A = np.random.normal(0, 1 / np.sqrt(m), size=(n, m))
         # adding noise
-        if  args.noise == "random_bora":
-            noise = np.random.normal(0,1,size=(n_test,m))
-            noise = noise * 0.1/np.sqrt(m)
+        if args.noise == "random_bora":
+            noise = np.random.normal(0, 1, size=(n_test, m))
+            noise = noise * 0.1 / np.sqrt(m)
         else:
-            noise = np.random.normal(0,1,size=(n_test,m))
-            noise = noise / (np.linalg.norm(noise,2,axis=-1, keepdims=True)) * float(args.noise) 
-        y_true    = np.matmul(x_test.reshape(n_test,-1), A) + noise
-        x_hat     = estimator(np.sqrt(2*m)*A, np.sqrt(2*m)*y_true, new_args)
-        x_hat     = np.array(x_hat)
-        x_hat     = x_hat.reshape(-1,64,64,3)
-        
-        x_hat     = np.clip(x_hat,0,1)
-        psnr = [compare_psnr(x,xhat) for x,xhat in zip(x_test,x_hat)]
+            noise = np.random.normal(0, 1, size=(n_test, m))
+            noise = noise / (np.linalg.norm(noise, 2, axis=-1, keepdims=True)) * float(args.noise)
+        y_true = np.matmul(x_test.reshape(n_test, -1), A) + noise
+
+        estimator = celebA_estimators.lasso_dct_estimator(new_args, np.sqrt(2 * m) * A)
+
+        x_hat = estimator(np.sqrt(2 * m) * y_true, new_args)
+        x_hat = np.array(x_hat)
+        x_hat = x_hat.reshape(-1, args.size, args.size, 3)
+
+        x_hat = np.clip(x_hat, 0, 1)
+        psnr = [compare_psnr(x, xhat) for x, xhat in zip(x_test, x_hat)]
         # print performance analysis
-        printout = "+-"*10 + "%s"%args.dataset + "-+"*10 + "\n"
-        printout = printout + "\t n_test    = %d\n"%len(x_hat)
-        printout = printout + "\t n         = %d\n"%n
-        printout = printout + "\t m         = %d\n"%m
+        printout = "+-" * 10 + "%s" % args.dataset + "-+" * 10 + "\n"
+        printout = printout + "\t n_test    = %d\n" % len(x_hat)
+        printout = printout + "\t n         = %d\n" % n
+        printout = printout + "\t m         = %d\n" % m
         printout = printout + "\t solver    = lasso_dct\n"
-        printout = printout + "\t gamma     = %0.8f\n"%gamma
-        printout = printout + "\t PSNR      = %0.3f \n"%np.mean(psnr)
+        printout = printout + "\t gamma     = %0.8f\n" % gamma
+        printout = printout + "\t PSNR      = %0.3f \n" % np.mean(psnr)
         print(printout)
-        
+
         if args.save_metrics_text:
-            with open("%s_cs_dct_results.txt"%args.dataset,"a") as f:
+            with open("%s_cs_dct_results.txt" % args.dataset, "a") as f:
                 f.write('\n' + printout)
-        
+
         # saving images
         if args.save_results:
             save_path_template = save_path + "/cs_m_%d_lasso_dct_gamma_%0.8f"
-            save_path = save_path_template%(m,gamma)           
+            save_path = save_path_template % (m, gamma)
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
             else:
@@ -580,7 +589,7 @@ def DCTCS(args):
                         os.makedirs(save_path_2)
                         save_path = save_path_2
 
-            _ = [sio.imsave(save_path+"/"+name, x) for x,name in zip(x_hat,file_names)]                    
-#            _ = [sio.imsave(save_path+"/"+name.split(".")[0]+".jpg", x, quality=100) for x,name in zip(x_hat,file_names)]
-            np.save(save_path+"/original.npy", x_test)
-            np.save(save_path+"/recovered.npy", x_hat)
+            _ = [sio.imsave(save_path + "/" + name, x) for x, name in zip(x_hat, file_names)]
+            #            _ = [sio.imsave(save_path+"/"+name.split(".")[0]+".jpg", x, quality=100) for x,name in zip(x_hat,file_names)]
+            np.save(save_path + "/original.npy", x_test)
+            np.save(save_path + "/recovered.npy", x_hat)

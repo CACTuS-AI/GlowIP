@@ -1,30 +1,28 @@
 # GlowIP
-Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Ali Ahmed and Paul Hand.
+Code to reproduce results from the [paper](https://proceedings.icml.cc/static/paper_files/icml/2020/2655-Paper.pdf), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Max Daniels, Ali Ahmed, Oscar Leong, and Paul Hand.
 
 
 
 In this paper, we demonstrate that an invertible generative model, specifically GLOW, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.
 
 
-| ![image](./images/cs_plot.png) | ![image](./images/denoising_plot.png) |
+
+| ![image](./images/denoising_plot_s0.1,0.2.png) |
+| :---: |
+| <b> Denoising</b>: PSNR for 64px image denoising at the noise level <img src="https://render.githubusercontent.com/render/math?math=\sigma">. |
+| ![image](./images/cs_plot_64px.png) |
+| <b> Compressive Sensing</b>: PSNR for 64px compressive sensing recoveries for in- and out-of-distribution images. |
+
+| <img src="./images/celeba_denoising_s=0,1_z2.png" width=700px/> | <img src="./images/celeba_m=7500_md_panel.png" width=700px /> |
 | :---: | :---: |
-| <b> Compressive Sensing </b> | <b> Denoising </b> |
-
-| ![image](./images/cs_visual_m750.jpg) |
-| :---: |
-| <b>Compressive Sensing at m=750 (6%) measurements</b> |
-
-| ![image](./images/denoising_visual.jpg) |
-| :---: |
-| <b> Denoising</b> |
-
+| <b>Denoising</b>: qualitative results for 64px in-distribution denoising. | <b>Compressive Sensing</b>: qualitative results for 128px in-distribution compressive sensing, here with approximately 25% measurements.
 <br/>
 <br/>
 <br/>
 
-**Prepare Datasets**
+**Prepare Training Datasets**
 
-To prepare training and validation dataset for celebA, birds and flowers, move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets used in the paper.  
+To prepare training and validation datasets for [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html), [Caltech-UCSD Birds 200](http://www.vision.caltech.edu/visipedia/CUB-200.html), and the [Oxford Flowers dataset](https://www.robots.ox.ac.uk/~vgg/data/flowers/), move into ```./data``` directory and run ```setup_{data}.sh``` followed by ```process_{data}.py``` as shown below. ```setup_{data}.sh``` will download and extract compressed files in the desired folders. The python script then ```process_{data}.py``` will then pre-process and split each data into training and validation sets.  
 
 ```shell
 cd data/
@@ -41,7 +39,10 @@ python process_birds.py
 python process_flowers.py
 ```
 
-The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories. Test Images, used in the paper, are placed in the directory ```test_images```. These were randomly extracted from the validation set of these processed datasets.
+The processed datasets will be placed in ```celeba_processed```, ```birds_processed``` and ```flowers_processed``` directories.
+
+We present results mainly for images from the CelebA validation set and from [Flickr-Faces-HQ](https://github.com/NVlabs/ffhq-dataset), along with additional results for a random selection of out-of-distribution qualitative images "in the wild." All test sets used in our experiments are available in the directory ```test_images```. 
+
 
 <br/>
 <br/>
@@ -77,7 +78,7 @@ The weights of Glow and DCGAN will be saved in ``` trained_models/{data}/glow/``
 <br/>
 <br/>
 
->  Pre-trained models, used in the paper, can be downloaded from [here](https://drive.google.com/file/d/1Fsamp8vRplFFBW7U5uVitmYtm_rzmSr5/view?usp=sharing). Additionally, to run lasso-wavelet experiments for compressive sensing, download this [npy](https://drive.google.com/open?id=1dYRFX5rCmQUfVGXPIX2E5l9L6sb6TEsI) file and place in ```solvers/lasso_utils/``` directory.
+>  Pre-trained models, used in the paper, can be downloaded from [here](https://drive.google.com/file/d/1Jka_saqrAdD6IwMBEfLPoUyh77aB5hCF/view). Additionally, to run lasso-wavelet experiments for compressive sensing, generate the wavelet basis vectors by running `solvers/lasso_utils/wavelet_basis.py`.
 
 <br/>
 <br/>
@@ -211,12 +212,13 @@ python align_faces/align_faces.py -input {path_to_image} -output {path_to_output
 If you find our work useful in your research or publication, please cite it:
 
 ```
-@article{asim2019invertible,
-  title={Invertible generative models for inverse problems: mitigating representation error and dataset bias},
-  author={Asim, Muhammad and Ahmed, Ali and Hand, Paul},
-  journal={arXiv preprint arXiv:1905.11672},
-  year={2019}
+@incollection{icml2020_2655,
+ abstract = {Trained generative models have shown remarkable performance as priors for inverse problems in imaging.  For example, Generative Adversarial Network priors permit recovery of test images from 5-10x fewer measurements than sparsity priors.  Unfortunately, these models may be unable to represent any particular image because of architectural choices, mode collapse, and bias in the training dataset. In this paper, we demonstrate that invertible neural networks, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.  Given a trained generative model, we study the empirical risk formulation of the desired inverse problem under a regularization that promotes high likelihood images, either directly by penalization or algorithmically by initialization. For compressive sensing, invertible priors can yield higher accuracy than sparsity priors across almost all undersampling ratios.  For the same accuracy on test images, they can use 10-20x fewer measurements.  We demonstrate that invertible priors can yield better reconstructions than GAN priors for images that have rare features of variation within the biased training set, including out-of-distribution natural images.  We additionally compare performance for compressive sensing to unlearned methods, such as the deep decoder, and we establish theoretical bounds on expected recovery error in the case of a linear invertible model.},
+ author = {Asim, Muhammad and Daniels, Max and Leong, Oscar and Hand, Paul and Ahmed, Ali},
+ booktitle = {Proceedings of Machine Learning and Systems 2020},
+ pages = {4577--4587},
+ title = {Invertible generative models for inverse problems: mitigating representation error and dataset bias},
+ year = {2020}
 }
-
 ```
 

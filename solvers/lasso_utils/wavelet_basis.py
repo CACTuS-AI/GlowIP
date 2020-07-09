@@ -5,9 +5,9 @@ import pywt
 import numpy as np
 
 
-def generate_basis():
+def generate_basis(s=64):
     """generate the basis"""
-    x = np.zeros((64, 64))
+    x = np.zeros((s, s))
     coefs = pywt.wavedec2(x, 'db1')
     n_levels = len(coefs)
     basis = []
@@ -34,5 +34,7 @@ def generate_basis():
 
 
 if __name__ == '__main__':
-    basis = generate_basis()
-    np.save('./wavelet_basis.npy', basis)
+    basis64 = generate_basis(s=64)
+    basis128 = generate_basis(s=128)
+    np.save('./wavelet_basis_64.npy', basis64)
+    np.save('./wavelet_basis_128.npy', basis128)
