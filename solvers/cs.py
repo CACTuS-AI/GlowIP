@@ -30,7 +30,6 @@ def solveCS(args):
     else:
         raise "prior not defined correctly"
 
-
 def GlowCS(args):
     if args.init_norms == None:
         args.init_norms = [None]*len(args.m)
@@ -180,7 +179,10 @@ def GlowCS(args):
                     y_gen       = torch.matmul(x_gen_flat, A) 
                     global residual_t
                     residual_t = ((y_gen - y_true)**2).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_squared:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
+                    else:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())
@@ -360,7 +362,10 @@ def GANCS(args):
                     y_gen       = torch.matmul(x_gen_flat, A) 
                     global residual_t
                     residual_t  = ((y_gen - y_true)**2).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_unsquared:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    else:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())

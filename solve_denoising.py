@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('-init_std', type=float,help='std of init_strategy is random', default=0)
     parser.add_argument('-save_metrics_text',type=bool, help='whether to save results to a text file',default=True)
     parser.add_argument('-save_results',type=bool,help='whether to save results after experiments conclude',default=True)
-    parser.add_argument('-z_penalty_squared',type=bool,help='use ||z||^2 if True else ||z||',default=False)
+    parser.add_argument('-z_penalty_unsquared', action="store_true",help="use ||z|| if True else ||z||^2")
     args = parser.parse_args()
     solveDenoising(args)
     

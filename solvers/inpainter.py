@@ -158,7 +158,10 @@ def GlowInpaint(args):
                     x_masked_gen   = x_gen  * mask
                     global residual_t
                     residual_t  = ((x_masked_gen - x_masked_test)**2).view(len(x_masked_test),-1).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_unsquared:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    else:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())
@@ -330,7 +333,10 @@ def GANInpaint(args):
                     x_masked_gen   = x_gen  * mask
                     global residual_t
                     residual_t  = ((x_masked_gen - x_masked_test)**2).view(len(x_masked_test),-1).sum(dim=1).mean()
-                    z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    if args.z_penalty_unsquared:
+                        z_reg_loss_t= gamma*z_sampled.norm(dim=1).mean()
+                    else:
+                        z_reg_loss_t= gamma*(z_sampled.norm(dim=1)**2).mean()
                     loss_t      = residual_t + z_reg_loss_t
                     psnr        = psnr_t(x_test, x_gen)
                     psnr        = 10 * np.log10(1 / psnr.item())
