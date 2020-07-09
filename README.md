@@ -1,5 +1,5 @@
 # GlowIP
-Code to reproduce results from the [paper](https://arxiv.org/abs/1905.11672), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Max Daniels, Ali Ahmed, Oscar Leong, and Paul Hand.
+Code to reproduce results from the [paper](https://proceedings.icml.cc/static/paper_files/icml/2020/2655-Paper.pdf), **"Invertible generative models for inverse problems: mitigating representation error and dataset bias"** by M. Asim, Max Daniels, Ali Ahmed, Oscar Leong, and Paul Hand.
 
 
 
@@ -212,12 +212,13 @@ python align_faces/align_faces.py -input {path_to_image} -output {path_to_output
 If you find our work useful in your research or publication, please cite it:
 
 ```
-@article{asim2019invertible,
-  title={Invertible generative models for inverse problems: mitigating representation error and dataset bias},
-  author={Asim, Muhammad and Ahmed, Ali and Hand, Paul},
-  journal={arXiv preprint arXiv:1905.11672},
-  year={2019}
+@incollection{icml2020_2655,
+ abstract = {Trained generative models have shown remarkable performance as priors for inverse problems in imaging.  For example, Generative Adversarial Network priors permit recovery of test images from 5-10x fewer measurements than sparsity priors.  Unfortunately, these models may be unable to represent any particular image because of architectural choices, mode collapse, and bias in the training dataset. In this paper, we demonstrate that invertible neural networks, which have zero representation error by design, can be effective natural signal priors at inverse problems such as denoising, compressive sensing, and inpainting.  Given a trained generative model, we study the empirical risk formulation of the desired inverse problem under a regularization that promotes high likelihood images, either directly by penalization or algorithmically by initialization. For compressive sensing, invertible priors can yield higher accuracy than sparsity priors across almost all undersampling ratios.  For the same accuracy on test images, they can use 10-20x fewer measurements.  We demonstrate that invertible priors can yield better reconstructions than GAN priors for images that have rare features of variation within the biased training set, including out-of-distribution natural images.  We additionally compare performance for compressive sensing to unlearned methods, such as the deep decoder, and we establish theoretical bounds on expected recovery error in the case of a linear invertible model.},
+ author = {Asim, Muhammad and Daniels, Max and Leong, Oscar and Hand, Paul and Ahmed, Ali},
+ booktitle = {Proceedings of Machine Learning and Systems 2020},
+ pages = {4577--4587},
+ title = {Invertible generative models for inverse problems: mitigating representation error and dataset bias},
+ year = {2020}
 }
-
 ```
 
